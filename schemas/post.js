@@ -27,12 +27,4 @@ const postSchema = new mongoose.Schema({
   },
 )
 
-postSchema.virtual('postId').get(function() {
-  return this._id.toHexString()
-})
-
-postSchema.set('toJSON', {
-  virtuals: true,
-})
-
 export default mongoose.model('Post', postSchema)

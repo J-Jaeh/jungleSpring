@@ -1,5 +1,6 @@
 import express from 'express'
 import Post from '../schemas/post.js'
+
 let router = express.Router()
 
 
@@ -10,20 +11,20 @@ let router = express.Router()
  */
 router.get('/', async (req, res) => {
 
-  const allPosts = await Post.find({})
+  const allPosts = await Post.find({}, { title: 1, author: 1, createdAt: 1 })
     .sort({ createdAt: -1 })
-    .exec()
-  const result = allPosts.map(item => {
-    return {
-      postId: item._id,
-      title: item.title,
-      createdAt: item.createAt.toString,
-    }
-  })
+  // const result = allPosts.map(item => {
+  //   // return {
+  //   //   postId: item._id,
+  //   //   title: item.title,
+  //   //   createdAt: item.createdAt.toString,
+  //   // }
+  //   return res.status(200).json(result)
+  // })
 
   return res.status(200).json({
     success: true,
-    posts: result,
+    posts: allPosts,
   })
 })
 

@@ -1,20 +1,20 @@
 import express from 'express'
+import * as dotenv from 'dotenv'
 import routes from './routes/index.js'
-import connect from './schemas/index.js'
+import connect from './config/db.js'
 
-const port = 3000
+const PORT = process.env.PORT || 3030;
+const app = express()
+
+dotenv.config()
 connect()
-
-
-let app = express()
 
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
-
 app.use('/', routes)
 
 
-app.listen(port, () => {
-  console.log(`서버가 http://localhost:${port} 에서 시작되었습니다.`)
+app.listen(PORT, () => {
+  console.log(`서버가 http://localhost:${PORT} 에서 시작되었습니다.`)
 })
