@@ -1,18 +1,15 @@
-import express from 'express';
-import postRouter from './posts.js';
+import express from 'express'
+import postRouter from './posts.js'
 
 
-const router = express.Router();
+const router = express.Router()
 
 
 router.get('/', (req, res) => {
-    res.status(200).send('Welcome');
+  res.status(200).send('Welcome')
 })
 
-router.use("/posts",postRouter);
+router.use('/posts', postRouter)
 
 
-
-
-
-export default router;
+export default router
