@@ -1,4 +1,7 @@
 import mongoose from 'mongoose'
+// import * as dotenv from 'dotenv'
+// dotenv.config()
+// const DB_URL = process.env.DB_URL
 
 const connect = () => {
   mongoose
