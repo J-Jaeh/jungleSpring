@@ -1,0 +1,14 @@
+# Node.js
+node_modules/
+package-lock.json
+labels.json
+
+# Environment
+.env
+
+# Logs
+logs/
+*.log
+
+# Build
+dist/
