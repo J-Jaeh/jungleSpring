@@ -52,20 +52,49 @@ router.get('/:id', async (req, res) => {
 })
 
 /**
+ * 글 수정
+ */
+router.put('/:id', async (req, res) => {
+  const { id } = req.params
+  const findPost = await Post.findById({ _id: id }).exec()
+
+  if (!findPost) return res.status(404).json({ success: false, errorMessage: 'Post not found' })
+
+
+  const { title, content, reqPassword } = req.body
+
+  if (reqPassword !== findPost.password) return res.status(401).json({
+    success: false,
+    errorMessage: 'Password not match',
+  })
+
+  if (title) {
+    findPost.title = title
+  }
+  if (content) {
+    findPost.content = content
+  }
+  await findPost.save()
+
+  return res.status(200).json({ success: true, posts_id: findPost._id })
+})
+
+
+/**
  * 글 삭제
  */
 router.delete('/:id', async (req, res) => {
   const { id } = req.params
-  const { password } = req.body
-  if (!password) {
+  const { reqPassword } = req.body
+  if (!reqPassword) {
     return res.status(400).json({ success: false, errorMessage: 'Password not match' })
   }
 
-  const findPost = await Post.findById({ _id: id }, { password: 1 }).exec()
+  const { password } = await Post.findById({ _id: id }).exec()
 
-  if (!findPost) return res.status(400).json({ success: false, errorMessage: 'Post not found' })
+  if (!password) return res.status(400).json({ success: false, errorMessage: 'Post not found' })
 
-  if (password === findPost.password) {
+  if (password === reqPassword) {
     await post.deleteOne({ _id: id }).exec()
     return res.status(200).json({ success: true })
   }
