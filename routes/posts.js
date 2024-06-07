@@ -11,7 +11,7 @@ let router = express.Router()
  */
 router.get('/', async (req, res) => {
 
-  const allPosts = await Post.find({}, { title: 1, author: 1, createdAt: 1 ,_id:0})
+  const allPosts = await Post.find({}, { title: 1, nickname: 1, createdAt: 1 ,_id:0})
     .sort({ createdAt: -1 })
 
   return res.status(200).json({
