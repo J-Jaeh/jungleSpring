@@ -1,6 +1,5 @@
 import express from 'express'
 import Post from '../schemas/post.js'
-import post from '../schemas/post.js'
 
 let router = express.Router()
 
@@ -20,7 +19,6 @@ router.get('/', async (req, res) => {
     posts: allPosts,
   })
 })
-
 
 /**
  * 글 생성
