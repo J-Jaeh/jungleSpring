@@ -10,7 +10,6 @@ router.post("/", async (req, res) => {
   const { nickname, password, checkPassword } = req.body;
   if (checkPassword !== password) { return res.status(401).send({ error: "Passwords do not match" }); }
 
-  ///어차피 예외를 db 조회할때 처리할건데 ..
   try{
     const user = new User({nickname:nickname, password:password});
     await user.save()
