@@ -12,7 +12,7 @@ let router = express.Router()
  */
 router.get('/', async (req, res) => {
 
-  const allPosts = await Post.find({}, { title: 1, author: 1, createdAt: 1 })
+  const allPosts = await Post.find({}, { title: 1, author: 1, createdAt: 1 ,_id:0})
     .sort({ createdAt: -1 })
 
   return res.status(200).json({
@@ -54,7 +54,7 @@ router.get('/:id', async (req, res) => {
 /**
  * 글 수정
  */
-router.put('/:id', async (req, res) => {
+router.patch('/:id', async (req, res) => {
   const { id } = req.params
   const findPost = await Post.findById({ _id: id }).exec()
 
