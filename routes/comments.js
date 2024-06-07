@@ -1,4 +1,5 @@
 import express from 'express'
+import mongoose from 'mongoose'
 import Comment from '../schemas/comment.js'
 import Post from '../schemas/post.js'
 
@@ -10,6 +11,12 @@ const router = express.Router()
  */
 router.get('/:postId', async (req, res) => {
   const { postId } = req.params
+
+  // commentId가 유효한 ObjectId 형태인지 확인
+  if (!mongoose.Types.ObjectId.isValid(postId)) {
+    return res.status(400).json({ success: false, errorMessage: 'Invalid post ID' })
+  }
+
   const findPostId = await Post.findById({ _id: postId }, { _id: 1 }).exec()
 
   if (!findPostId) return res.status(400).json({ success: false, errorMessage: 'Post not found' })
@@ -27,6 +34,12 @@ router.get('/:postId', async (req, res) => {
 router.post('/:postId', async (req, res) => {
   const { content } = req.body
   const { postId } = req.params
+
+  // postId가 유효한 ObjectId 형태인지 확인
+  if (!mongoose.Types.ObjectId.isValid(postId)) {
+    return res.status(400).json({ success: false, errorMessage: 'Invalid post ID' })
+  }
+
   if (!content) return res.status(400).json({ success: false, errorMessage: '댓글 내용을 입력해주세요' })
 
   const findPostId = await Post.findById({ _id: postId }, { _id: 1 }).exec()
@@ -48,15 +61,44 @@ router.patch('/:commentId', async (req, res) => {
   const { commentId } = req.params
   const { reqContent } = req.body
 
+  // commentId가 유효한 ObjectId 형태인지 확인
+  if (!mongoose.Types.ObjectId.isValid(commentId)) {
+    return res.status(400).json({ success: false, errorMessage: 'Invalid comment ID' })
+  }
+
   if (!reqContent) return res.status(400).json({ success: false, errorMessage: '댓글 내용을 입력해주세요' })
 
   const findComment = await Comment.findById({ _id: commentId }).exec()
+
+  if(!findComment) return res.status(400).json({ success: false, errorMessage: 'Comment not found' })
 
   findComment.content = reqContent
 
   await findComment.save()
   return res.status(200).json({ success: true, comment_id: commentId })
 })
+
+
+/**
+ * 댓글 삭제
+ */
+router.delete('/:commentId', async (req, res) => {
+  const { commentId } = req.params
+
+  // commentId가 유효한 ObjectId 형태인지 확인
+  if (!mongoose.Types.ObjectId.isValid(commentId)) {
+    return res.status(400).json({ success: false, errorMessage: 'Invalid comment ID' })
+  }
+
+  const findComment = await Comment.findById({ _id: commentId }).exec()
+
+  if(!findComment) return res.status(400).json({ success: false, errorMessage: 'Comment not found' })
+
+  await findComment.deleteOne({ _id: commentId }).exec()
+
+  return res.status(200).json({ success: true})
+})
+
 
 
 export default router
