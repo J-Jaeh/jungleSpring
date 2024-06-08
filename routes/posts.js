@@ -1,10 +1,15 @@
 import express from 'express'
-import Post from '../schemas/post.js'
-import User from '../schemas/user.js'
-import Comment from '../schemas/comment.js'
+// import Post from '../models/post.js'
+import User from '../models/user.js'
+import Comment from '../models/comment.js'
 import authMiddleware from '../middleware/auth-middleware.js'
+import { PostModel } from '../models/post.js'
+import { PostService } from '../services/postService.js'
+
 
 let router = express.Router()
+
+const postService = new PostService(new PostModel())
 
 
 /**
@@ -28,10 +33,10 @@ router.get('/', async (req, res) => {
  */
 router.post('/create', [authMiddleware, async (req, res) => {
   const { title, content } = req.body
-  const nickname =res.locals.nickname
+  const nickname = res.locals.nickname
   console.log(nickname)
-  const post = new Post({ nickname: nickname, title: title, content: content })
-  await post.save()
+
+  const post = postService.createPost({ nickname: nickname, title: title, content: content })
 
   return res.status(200).json({
     success: true,
@@ -59,11 +64,11 @@ router.get('/:id', async (req, res) => {
  */
 router.patch('/:id', [authMiddleware, async (req, res) => {
   // await isCheck(req,res)
-    // return res.status(401).json({ success: false, errorMessage: 'Unauthorized' })
+  // return res.status(401).json({ success: false, errorMessage: 'Unauthorized' })
   //
-  const nickname =res.locals.nickname
+  const nickname = res.locals.nickname
   const { id } = req.params
-  const findPost = await Post.findOne({ _id: id,nickname: nickname }).exec()
+  const findPost = await Post.findOne({ _id: id, nickname: nickname }).exec()
 
   if (!findPost) return res.status(404).json({ success: false, errorMessage: 'Unauthorized' })
 
@@ -91,21 +96,20 @@ router.patch('/:id', [authMiddleware, async (req, res) => {
  */
 router.delete('/:id', [authMiddleware, async (req, res) => {
   const { id } = req.params
-  const nickname =res.locals.nickname
+  const nickname = res.locals.nickname
   //인증은 되었지만 실제 작성자인지 확인하는게 필요함
-  const findPost = await Post.findOne({ _id: id, nickname:nickname }).exec()
+  const findPost = await Post.findOne({ _id: id, nickname: nickname }).exec()
 
-  if(!findPost) return res.status(404).json({ success: false, errorMessage: 'Unauthorized' })
+  if (!findPost) return res.status(404).json({ success: false, errorMessage: 'Unauthorized' })
 
   //연관된 댓글도 삭제해야함.
-  const commentIds= await Comment.find({postId:id},{_id:1}).exec()
+  const commentIds = await Comment.find({ postId: id }, { _id: 1 }).exec()
   // console.log(commentIds)
-  await Comment.deleteMany({_id:{$in: commentIds}}).exec();
+  await Comment.deleteMany({ _id: { $in: commentIds } }).exec()
 
   await findPost.deleteOne({ _id: id }).exec()
   return res.status(200).json({ success: true })
 }])
-
 
 
 export default router

@@ -1,7 +1,7 @@
 import express from 'express'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
-import User from '../schemas/user.js'
+import User from '../models/user.js'
 import { SECRETKEY } from '../app.js'
 
 const router = express.Router()

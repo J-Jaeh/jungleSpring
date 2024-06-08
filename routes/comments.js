@@ -1,7 +1,7 @@
 import express from 'express'
 import mongoose from 'mongoose'
-import Comment from '../schemas/comment.js'
-import Post from '../schemas/post.js'
+import Comment from '../models/comment.js'
+import Post from '../models/post.js'
 import authMiddleware from '../middleware/auth-middleware.js'
 
 

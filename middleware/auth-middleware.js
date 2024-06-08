@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken'
-import User from '../schemas/user.js'
+import User from '../models/user.js'
 import {SECRETKEY} from '../app.js'
 
 
