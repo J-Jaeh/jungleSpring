@@ -26,9 +26,8 @@ router.get('/', async (req, res) => {
 /**
  * 글 생성
  */
-router.post('/', [authMiddleware, async (req, res) => {
+router.post('/create', [authMiddleware, async (req, res) => {
   const { title, content } = req.body
-  isCheck(req,res)
   const nickname =res.locals.nickname
   console.log(nickname)
   const post = new Post({ nickname: nickname, title: title, content: content })
@@ -59,14 +58,14 @@ router.get('/:id', async (req, res) => {
  * 글 수정
  */
 router.patch('/:id', [authMiddleware, async (req, res) => {
-  await isCheck(req,res)
+  // await isCheck(req,res)
     // return res.status(401).json({ success: false, errorMessage: 'Unauthorized' })
   //
+  const nickname =res.locals.nickname
   const { id } = req.params
-  const findPost = await Post.findById({ _id: id }).exec()
+  const findPost = await Post.findOne({ _id: id,nickname: nickname }).exec()
 
-  if (!findPost) return res.status(404).json({ success: false, errorMessage: 'Post not found' })
-
+  if (!findPost) return res.status(404).json({ success: false, errorMessage: 'Unauthorized' })
 
   const { title, content, reqPassword } = req.body
 
@@ -92,11 +91,11 @@ router.patch('/:id', [authMiddleware, async (req, res) => {
  */
 router.delete('/:id', [authMiddleware, async (req, res) => {
   const { id } = req.params
-
+  const nickname =res.locals.nickname
   //인증은 되었지만 실제 작성자인지 확인하는게 필요함
-  await isCheck(req,res)
-  const findPost = await Post.findById({ _id: id }).exec()
+  const findPost = await Post.findOne({ _id: id, nickname:nickname }).exec()
 
+  if(!findPost) return res.status(404).json({ success: false, errorMessage: 'Unauthorized' })
 
   //연관된 댓글도 삭제해야함.
   const commentIds= await Comment.find({postId:id},{_id:1}).exec()
@@ -106,20 +105,6 @@ router.delete('/:id', [authMiddleware, async (req, res) => {
   await findPost.deleteOne({ _id: id }).exec()
   return res.status(200).json({ success: true })
 }])
-
-
-/// ㅇㅎ 어차피 res에 유저이름 담겨있다고 생각  -> 나중에 모듈로 분리 ~!
-const isCheck = async (req, res) => {
-  const reqNickname=res.locals.nickname
-  const nickname = await User.findOne({nickname:reqNickname}).exec()
-  const result =  User.deleteOne({})
-  if(!nickname) return res.status(404).json({ success: false, errorMessage: '권한없음' })
-
-  if( nickname!==reqNickname) return res.status(401).json({ success: false, errorMessage: '권한없음' })
-
-  return  res.locals.nickname=reqNickname;
-}
-
 
 
 
