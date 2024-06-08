@@ -6,7 +6,7 @@ export class PostService {
 
 
   async getAllPost(){
-
+    return this.postModel.getAllPost();
   }
 
   async createPost(post){

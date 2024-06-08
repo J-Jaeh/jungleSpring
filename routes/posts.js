@@ -19,8 +19,7 @@ const postService = new PostService(new PostModel())
  */
 router.get('/', async (req, res) => {
 
-  const allPosts = await Post.find({}, { title: 1, nickname: 1, createdAt: 1, _id: 0 })
-    .sort({ createdAt: -1 })
+  const allPosts = postService.getAllPost()
 
   return res.status(200).json({
     success: true,

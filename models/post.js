@@ -16,12 +16,15 @@ const Post = mongoose.model('Post', postSchema)
 
 export class PostModel {
 
-  /**
-   *게시글 생성
-   */
-  async creatPost(post) {
+  //생성
+  async createPost(post) {
     const createdPost = new Post(post)
     return await createdPost.save()
+  }
+
+  //전체 게시글 조회
+  async getAllPost() {
+    return await Post.find({},{ title: 1, nickname: 1, createdAt: 1, _id: 0}).sort({ createdAt: -1 })
   }
 
 }
