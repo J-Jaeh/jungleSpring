@@ -36,6 +36,13 @@ export class PostModel {
   async editPost(id, req, nickname) {
     return Post.findOneAndUpdate({ _id: id, nickname: nickname }, req, { new: true })
   }
+
+  //삭제
+  async deletePost(id, nickname) {
+
+    return Post.findOneAndDelete({ _id: id, nickname: nickname }).exec()
+  }
+
 }
 
 

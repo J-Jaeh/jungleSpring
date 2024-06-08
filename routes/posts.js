@@ -81,16 +81,16 @@ router.patch('/:id', [authMiddleware, async (req, res) => {
 router.delete('/:id', [authMiddleware, async (req, res) => {
   const { id } = req.params
   const nickname = res.locals.nickname
-  //인증은 되었지만 실제 작성자인지 확인하는게 필요함
-  const findPost = await Post.findOne({ _id: id, nickname: nickname }).exec()
 
-  if (!findPost) return res.status(404).json({ success: false, errorMessage: 'Unauthorized' })
-
+  const deletePost = await postService.deletePost(id,nickname)
+  if (!deletePost) {
+    return res.status(404).send({success: false, errorMessage: 'Unauthorized'})
+  }
   //연관된 댓글도 삭제해야함.
-  const commentIds = await Comment.find({ postId: id }, { _id: 1 }).exec()
-  // console.log(commentIds)
-  await Comment.deleteMany({ _id: { $in: commentIds } }).exec()
-  await findPost.deleteOne({ _id: id }).exec()
+  // const commentIds = await Comment.find({ postId: id }, { _id: 1 }).exec()
+  // // console.log(commentIds)
+  // await Comment.deleteMany({ _id: { $in: commentIds } }).exec()
+
   return res.status(200).json({ success: true })
 }])
 

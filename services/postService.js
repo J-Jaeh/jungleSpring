@@ -25,4 +25,8 @@ export class PostService {
     return this.postModel.editPost(id,req,reqNickname)
   }
 
+  async deletePost(id,reqNickname) {
+    return this.postModel.deletePost(id,reqNickname)
+  }
+
 }
