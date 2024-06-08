@@ -48,7 +48,7 @@ router.post('/create', [authMiddleware, async (req, res) => {
  */
 router.get('/:id', async (req, res) => {
   const { id } = req.params
-  const findPost = await Post.findById({ _id: id }, { title: 1, author: 1, createdAt: 1, content: 1 }).exec()
+  const findPost = postService.getPost()
 
   if (!findPost) return res.status(404).json({ success: false, errorMessage: 'Post not found' })
 
