@@ -1,10 +1,16 @@
+import { PostModel } from '../models/post.js'
+
+
+const postModel = new PostModel()
+
 export class PostService {
-  constructor(postModel) {
+
+  constructor() {
     this.postModel = postModel
   }
 
-  async getPost() {
-    return this.postModel.getPost()
+  async getPost(id) {
+    return this.postModel.getPost(id)
   }
 
   async getAllPost() {
@@ -12,8 +18,11 @@ export class PostService {
   }
 
   async createPost(post) {
-    //비지니스 로직이 들어가면 됨 .!
     return this.postModel.createPost(post)
+  }
+
+  async editPost(id,req,reqNickname) {
+    return this.postModel.editPost(id,req,reqNickname)
   }
 
 }

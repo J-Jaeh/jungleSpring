@@ -9,7 +9,7 @@ import { PostService } from '../services/postService.js'
 
 let router = express.Router()
 
-const postService = new PostService(new PostModel())
+const postService = new PostService()
 
 
 /**
@@ -19,7 +19,7 @@ const postService = new PostService(new PostModel())
  */
 router.get('/', async (req, res) => {
 
-  const allPosts = postService.getAllPost()
+  const allPosts = await postService.getAllPost()
 
   return res.status(200).json({
     success: true,
@@ -35,7 +35,7 @@ router.post('/create', [authMiddleware, async (req, res) => {
   const nickname = res.locals.nickname
   console.log(nickname)
 
-  const post = postService.createPost({ nickname: nickname, title: title, content: content })
+  const post = await postService.createPost({ nickname: nickname, title: title, content: content })
 
   return res.status(200).json({
     success: true,
@@ -48,7 +48,7 @@ router.post('/create', [authMiddleware, async (req, res) => {
  */
 router.get('/:id', async (req, res) => {
   const { id } = req.params
-  const findPost = postService.getPost()
+  const findPost = postService.getPost(id)
 
   if (!findPost) return res.status(404).json({ success: false, errorMessage: 'Post not found' })
 
@@ -62,31 +62,16 @@ router.get('/:id', async (req, res) => {
  * 글 수정
  */
 router.patch('/:id', [authMiddleware, async (req, res) => {
-  // await isCheck(req,res)
-  // return res.status(401).json({ success: false, errorMessage: 'Unauthorized' })
-  //
+
   const nickname = res.locals.nickname
   const { id } = req.params
-  const findPost = await Post.findOne({ _id: id, nickname: nickname }).exec()
+  const request = req.body
 
-  if (!findPost) return res.status(404).json({ success: false, errorMessage: 'Unauthorized' })
-
-  const { title, content, reqPassword } = req.body
-
-  if (reqPassword !== findPost.password) return res.status(401).json({
-    success: false,
-    errorMessage: 'Password not match',
-  })
-
-  if (title) {
-    findPost.title = title
+  const editPost = await postService.editPost(id, request, nickname)
+  if (!editPost) {
+    return res.status(404).send({success: false, errorMessage: 'Unauthorized'})
   }
-  if (content) {
-    findPost.content = content
-  }
-  await findPost.save()
-
-  return res.status(200).json({ success: true, posts_id: findPost._id })
+  return res.status(200).json({ success: true, posts_id: editPost._id })
 }])
 
 
@@ -105,7 +90,6 @@ router.delete('/:id', [authMiddleware, async (req, res) => {
   const commentIds = await Comment.find({ postId: id }, { _id: 1 }).exec()
   // console.log(commentIds)
   await Comment.deleteMany({ _id: { $in: commentIds } }).exec()
-
   await findPost.deleteOne({ _id: id }).exec()
   return res.status(200).json({ success: true })
 }])

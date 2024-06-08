@@ -19,17 +19,22 @@ export class PostModel {
   //생성
   async createPost(post) {
     const createdPost = new Post(post)
-    return await createdPost.save()
+    return createdPost.save()
   }
 
   //전체 게시글 조회
   async getAllPost() {
-    return await Post.find({}, { title: 1, nickname: 1, createdAt: 1, _id: 0 }).sort({ createdAt: -1 }).exec()
+    return Post.find({}, { title: 1, nickname: 1, createdAt: 1, _id: 0 }).sort({ createdAt: -1 }).exec()
   }
 
   //단일 게시글 조회
-  async getPost() {
-    return await Post.findById({ _id: id }, { title: 1, author: 1, createdAt: 1, content: 1 }).exec()
+  async getPost(id) {
+    return Post.findById({ _id: id }, { title: 1, author: 1, createdAt: 1, content: 1 }).exec()
+  }
+
+  //글 수정
+  async editPost(id, req, nickname) {
+    return Post.findOneAndUpdate({ _id: id, nickname: nickname }, req, { new: true })
   }
 }
 
