@@ -1,14 +1,20 @@
 import express from 'express'
 import * as dotenv from 'dotenv'
+import morgan from 'morgan'
 import routes from './routes/index.js'
 import connect from './config/db.js'
+import cookieParser from 'cookie-parser';
 
-connect()
+//순서 중요한듯 ?
 dotenv.config()
-
 const PORT = process.env.PORT || 3030;
+export const SECRETKEY = process.env.SECRETKEY
+export const DB_URL = process.env.DB_URL
 const app = express()
+connect()
 
+app.use(morgan(":method :status :url :response-time ms"));
+app.use(cookieParser());
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use('/', routes)

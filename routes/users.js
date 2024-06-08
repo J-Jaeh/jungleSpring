@@ -1,12 +1,10 @@
 import express from 'express'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
-import * as dotenv from 'dotenv'
 import User from '../schemas/user.js'
+import { SECRETKEY } from '../app.js'
 
-dotenv.config()
 const router = express.Router()
-const SECRETKEY = process.env.SECRETKEY
 
 
 /**
@@ -17,6 +15,10 @@ router.post('/register', async (req, res) => {
   if (checkPassword !== password) {
     return res.status(401).send({ error: 'Passwords do not match' })
   }
+  if(password.includes(nickname)) {
+    return res.status(401).send({ error: '비밀번호에는 닉네임을 포함할 수 없습니다' })
+  }
+
 
   ///어차피 예외를 db 조회할때 처리할건데 ..
   const hashedPassword = await bcrypt.hash(password, 10)
@@ -47,7 +49,8 @@ router.post('/login', async (req, res) => {
     errorMessage: 'Incorrect Username or Password, or Unregistered User',
   })
 
-  const isSame = bcrypt.compare(password, user.password)
+  //비동기함수라 await 걸어야함
+  const isSame = await bcrypt.compare(password, user.password)
 
   if (!isSame) {
     return res.status(400).send({

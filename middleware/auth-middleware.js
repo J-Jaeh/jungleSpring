@@ -1,9 +1,10 @@
 import jwt from 'jsonwebtoken'
 import User from '../schemas/user.js'
+import {SECRETKEY} from '../app.js'
 
 
-const auth= async (req, res, next) => {
-  const { Authorization } = req.cookie
+const auth= (req, res, next) => {
+  const { Authorization } = req.cookies
   const [authType, authToken] = (Authorization ?? '').split(' ');
 
   if (!authToken || authType !== 'Bearer') {
@@ -13,9 +14,9 @@ const auth= async (req, res, next) => {
     });
   }
   try {
-    const { nickname } = jwt.verify(authToken, );
+    const { nickname } = jwt.verify(authToken,SECRETKEY);
     console.log('로그인 사용자 nickname', nickname);
-    res.locals.user = await User.findOne({ nickname: nickname }).exec();
+    res.locals.nickname = nickname;
     next();
   } catch (err) {
     console.error(err);
@@ -25,5 +26,6 @@ const auth= async (req, res, next) => {
         '로그인 후 이용 가능한 기능입니다.(인증되지 못한 토큰임)',
     });
   }
-
 }
+
+export default auth;

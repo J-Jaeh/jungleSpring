@@ -2,6 +2,8 @@ import express from 'express'
 import mongoose from 'mongoose'
 import Comment from '../schemas/comment.js'
 import Post from '../schemas/post.js'
+import authMiddleware from '../middleware/auth-middleware.js'
+
 
 
 const router = express.Router()
@@ -31,7 +33,7 @@ router.get('/:postId', async (req, res) => {
 /**
  * 댓글작성
  */
-router.post('/:postId', async (req, res) => {
+router.post('/:postId',[authMiddleware,async (req, res) => {
   const { content } = req.body
   const { postId } = req.params
 
@@ -51,13 +53,13 @@ router.post('/:postId', async (req, res) => {
   await comment.save()
 
   return res.status(200).json({ success: true, comment_id: comment._id })
-})
+}])
 
 
 /**
  * 댓글 수정
  */
-router.patch('/:commentId', async (req, res) => {
+router.patch('/:commentId',[authMiddleware, async (req, res) => {
   const { commentId } = req.params
   const { reqContent } = req.body
 
@@ -76,13 +78,13 @@ router.patch('/:commentId', async (req, res) => {
 
   await findComment.save()
   return res.status(200).json({ success: true, comment_id: commentId })
-})
+}])
 
 
 /**
  * 댓글 삭제
  */
-router.delete('/:commentId', async (req, res) => {
+router.delete('/:commentId', [authMiddleware,async (req, res) => {
   const { commentId } = req.params
 
   // commentId가 유효한 ObjectId 형태인지 확인
@@ -97,7 +99,7 @@ router.delete('/:commentId', async (req, res) => {
   await findComment.deleteOne({ _id: commentId }).exec()
 
   return res.status(200).json({ success: true})
-})
+}])
 
 
 
