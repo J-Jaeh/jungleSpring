@@ -12,6 +12,8 @@ export class CommentService {
     return this.commentModel.createComment(comment)
   }
 
-
+  async getComments(postId){
+    return this.commentModel.getComments(postId)
+  }
 
 }

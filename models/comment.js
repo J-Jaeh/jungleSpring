@@ -20,4 +20,10 @@ export class CommentModel{
       const createdComment = new Comment(comment)
       return createdComment.save()
   }
+
+  async getComments(postId){
+    return Comment.find({ postId: postId }, { content: 1, createdAt: 1 })
+      .sort({ createdAt: -1 })
+      .exec()
+  }
 }

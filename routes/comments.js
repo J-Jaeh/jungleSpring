@@ -2,7 +2,7 @@ import express from 'express'
 import mongoose from 'mongoose'
 import { CommentService } from '../services/commentServices.js'
 import { PostService } from '../services/postService.js'
-
+import { checkPostId, commentId } from '../middleware/check-objectId-middleware.js'
 // import Post from '../models/post.js'
 import authMiddleware from '../middleware/auth-middleware.js'
 
@@ -14,44 +14,32 @@ const router = express.Router()
 /**
  * 댓글 조회
  */
-router.get('/:postId', async (req, res) => {
+router.get('/:postId', [checkPostId, async (req, res) => {
   const { postId } = req.params
-
-  // commentId가 유효한 ObjectId 형태인지 확인
-  if (!mongoose.Types.ObjectId.isValid(postId)) {
-    return res.status(400).json({ success: false, errorMessage: 'Invalid post ID' })
+  try {
+    await postService.getPost(postId)
+    const findComments = await commentService.getComments(postId)
+    return res.status(200).json({ success: true, findComments: findComments })
+  } catch (err) {
+    return res.status(400).json({ success: false, errorMessage: 'Post not found' })
   }
-
-  const findPostId = await Post.findById({ _id: postId }, { _id: 1 }).exec()
-
-  if (!findPostId) return res.status(400).json({ success: false, errorMessage: 'Post not found' })
-
-  const findComments = await Comment.find({ postId: postId }, { content: 1, createdAt: 1 })
-    .sort({ createdAt: -1 })
-    .exec()
-  return res.status(200).json({ success: true, findComments: findComments })
-})
+}])
 
 
 /**
  * 댓글작성
  */
-router.post('/:postId', [authMiddleware, async (req, res) => {
+router.post('/:postId', [authMiddleware, checkPostId, async (req, res) => {
   const { content } = req.body
   const { postId } = req.params
   const nickname = res.locals.nickname
 
-  // postId가 유효한 ObjectId 형태인지 확인 // 미들웨어로 빼기
-  if (!mongoose.Types.ObjectId.isValid(postId)) {
-    return res.status(400).json({ success: false, errorMessage: 'Invalid post ID' })
-  }
-
   if (!content) return res.status(400).json({ success: false, errorMessage: '댓글 내용을 입력해주세요' })
 
   try {
-    const findPost = await postService.getPost(postId)
+    await postService.getPost(postId)
     const creatComment = await commentService.createComment({
-      postId: findPost._id,
+      postId: postId,
       nickname: nickname,
       content: content,
     })
@@ -67,7 +55,7 @@ router.post('/:postId', [authMiddleware, async (req, res) => {
 /**
  * 댓글 수정
  */
-router.patch('/:commentId', [authMiddleware, async (req, res) => {
+router.patch('/:commentId', [authMiddleware, commentId, async (req, res) => {
   const { commentId } = req.params
   const { reqContent } = req.body
   const nickname = res.locals.nickname
@@ -92,7 +80,7 @@ router.patch('/:commentId', [authMiddleware, async (req, res) => {
 /**
  * 댓글 삭제
  */
-router.delete('/:commentId', [authMiddleware, async (req, res) => {
+router.delete('/:commentId', [authMiddleware, commentId, async (req, res) => {
   const { commentId } = req.params
   const nickname = res.locals.nickname
 
