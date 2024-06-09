@@ -1,9 +1,7 @@
 import express from 'express'
-// import Post from '../models/post.js'
-import User from '../models/user.js'
+
 import Comment from '../models/comment.js'
 import authMiddleware from '../middleware/auth-middleware.js'
-import { PostModel } from '../models/post.js'
 import { PostService } from '../services/postService.js'
 
 
@@ -48,7 +46,7 @@ router.post('/create', [authMiddleware, async (req, res) => {
  */
 router.get('/:id', async (req, res) => {
   const { id } = req.params
-  const findPost = postService.getPost(id)
+  const findPost = await postService.getPost(id)
 
   if (!findPost) return res.status(404).json({ success: false, errorMessage: 'Post not found' })
 

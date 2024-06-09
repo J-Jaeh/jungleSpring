@@ -39,7 +39,6 @@ export class PostModel {
 
   //삭제
   async deletePost(id, nickname) {
-
     return Post.findOneAndDelete({ _id: id, nickname: nickname }).exec()
   }
 

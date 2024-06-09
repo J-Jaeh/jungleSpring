@@ -12,5 +12,12 @@ const commentSchema = new mongoose.Schema({
   },
   { timestamps: true })
 
-export default mongoose.model('Comment', commentSchema)
+const Comment = mongoose.model('Comment', commentSchema)
 
+export class CommentModel{
+
+  async createComment(comment) {
+      const createdComment = new Comment(comment)
+      return createdComment.save()
+  }
+}

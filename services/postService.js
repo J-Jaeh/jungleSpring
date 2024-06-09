@@ -1,4 +1,5 @@
 import { PostModel } from '../models/post.js'
+import res from 'express/lib/response.js'
 
 
 const postModel = new PostModel()
@@ -10,7 +11,9 @@ export class PostService {
   }
 
   async getPost(id) {
-    return this.postModel.getPost(id)
+    const creatPost = await this.postModel.getPost(id)
+    if (!creatPost) return new Error('Post not found')
+    return creatPost
   }
 
   async getAllPost() {
@@ -21,12 +24,12 @@ export class PostService {
     return this.postModel.createPost(post)
   }
 
-  async editPost(id,req,reqNickname) {
-    return this.postModel.editPost(id,req,reqNickname)
+  async editPost(id, req, reqNickname) {
+    return this.postModel.editPost(id, req, reqNickname)
   }
 
-  async deletePost(id,reqNickname) {
-    return this.postModel.deletePost(id,reqNickname)
+  async deletePost(id, reqNickname) {
+    return this.postModel.deletePost(id, reqNickname)
   }
 
 }
