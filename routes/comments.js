@@ -70,7 +70,7 @@ router.patch('/:commentId', [authMiddleware, checkCommentId, async (req, res) =>
 
 /**
  * 댓글 삭제
- */``
+ */
 router.delete('/:commentId', [authMiddleware, checkCommentId, async (req, res) => {
   const { commentId } = req.params
   const nickname = res.locals.nickname

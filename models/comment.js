@@ -28,7 +28,7 @@ export class CommentModel {
   }
 
   async editComment(id, req, nickname) {
-    return Comment.findOneAndUpdate({ _id: id, nickname: nickname }, req, { new: true })
+    return Comment.findOneAndUpdate({ _id: id, nickname: nickname }, {content: req}, { new: true })
   }
 
   async deleteComment(id,nickname) {

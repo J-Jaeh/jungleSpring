@@ -12,7 +12,7 @@ export const checkPostId = (req, res, next) => {
 
 export const checkCommentId = (req, res, next) => {
   const { commentId }=req.params
-  if (!mongoose.Types.ObjectId.isValid(postId)) {
+  if (!mongoose.Types.ObjectId.isValid(commentId)) {
     return res.status(400).json({ success: false, errorMessage: 'Invalid post ID' })
   }
   next()

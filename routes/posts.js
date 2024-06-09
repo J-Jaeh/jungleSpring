@@ -83,7 +83,7 @@ router.delete('/:postId', [authMiddleware,checkPostId ,async (req, res) => {
   if (!deletePost) {
     return res.status(404).send({ success: false, errorMessage: 'Unauthorized' })
   }
-  await commentService.deleteComment(postId)
+  await commentService.deleteRelatedComments(postId)
 
   return res.status(200).json({ success: true })
 }])
