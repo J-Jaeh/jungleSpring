@@ -13,7 +13,7 @@ export const comparePassword = (password,reqPassword) =>{
           return new Error('passwords do not match')
 }
 
-export const hashedPassword = (res,password) => {
-  res.locals.hashedPassword = bcrypt.hash(password, 10)
+export const hashedPassword = async (password) => {
+  return  await bcrypt.hash(password, 10)
 }
 

@@ -17,21 +17,16 @@ router.post('/register', async (req, res) => {
   if (password.includes(nickname)) {
     return res.status(400).send({ error: '비밀번호에는 닉네임을 포함할 수 없습니다' })
   }
-  hashedPassword(res,password)
-  const hashPassword  = await res.locals.hashedPassword
+
   try {
-    const user = await userService.registerUser({ nickname: nickname, password:hashPassword  })
-    console.log("user=",user)
-    console.log("userId =",user._id)
+    const user = await userService.registerUser({ nickname: nickname, password:hashedPassword(password)  })
     res.status(200).send({ success: true, user_id: user._id })
   } catch (err) {
     if (err.code === 11000)
       return res.status(409).send({ success: false, errorMessage: 'User already exists' })
     if (err.name === 'ValidationError') {
-      console.error('ValidationError')
-      return res.status(400).send({ success: false, errorMessage: err.message })
+      console.log('ValidationError')
     }
-    console.error('Error')
     return res.status(400).send({ success: false, errorMessage: err.message })
   }
 })
