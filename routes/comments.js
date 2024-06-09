@@ -1,5 +1,4 @@
 import express from 'express'
-import mongoose from 'mongoose'
 import { CommentService } from '../services/commentServices.js'
 import { PostService } from '../services/postService.js'
 import { checkCommentId, checkPostId } from '../middleware/check-objectId-middleware.js'
@@ -64,30 +63,25 @@ router.patch('/:commentId', [authMiddleware, checkCommentId, async (req, res) =>
     await commentService.editComment(commentId, reqContent, nickname)
     return res.status(200).json({ success: true, comment_id: commentId })
   } catch (err) {
-    return res.status(403).json({ success: false, errorMessage: 'Unauthorized' })
+    return res.status(403).json({ success: false, errorMessage: err.message })
   }
 }])
 
 
 /**
  * 댓글 삭제
- */
+ */``
 router.delete('/:commentId', [authMiddleware, checkCommentId, async (req, res) => {
   const { commentId } = req.params
   const nickname = res.locals.nickname
 
-  // commentId가 유효한 ObjectId 형태인지 확인
-  if (!mongoose.Types.ObjectId.isValid(commentId)) {
-    return res.status(400).json({ success: false, errorMessage: 'Invalid comment ID' })
+  try {
+    await commentService.deleteComment(commentId, nickname)
+    return res.status(200).json({ success: true })
+  }catch (err) {
+    return res.status(400).json({ success: false, errorMessage: err.message })
   }
 
-  const findComment = await Comment.findOne({ _id: commentId, nickname: nickname }).exec()
-
-  if (!findComment) return res.status(400).json({ success: false, errorMessage: 'Unauthorized' })
-
-  await findComment.deleteOne({ _id: commentId }).exec()
-
-  return res.status(200).json({ success: true })
 }])
 
 

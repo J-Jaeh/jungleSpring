@@ -30,4 +30,8 @@ export class CommentModel {
   async editComment(id, req, nickname) {
     return Comment.findOneAndUpdate({ _id: id, nickname: nickname }, req, { new: true })
   }
+
+  async deleteComment(id,nickname) {
+    return Comment.findOneAndDelete({ _id: id ,nickname:nickname}).exec()
+  }
 }

@@ -25,4 +25,14 @@ export class CommentService {
     return editComment
   }
 
+  async deleteComment(id, req, reqNickname) {
+
+    const deleteComment = this.commentModel.deleteComment(id, reqNickname)
+
+    if (!deleteComment) {
+      return new Error('Unauthorized')
+    }
+
+    return deleteComment
+  }
 }
