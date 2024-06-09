@@ -34,4 +34,9 @@ export class CommentModel {
   async deleteComment(id,nickname) {
     return Comment.findOneAndDelete({ _id: id ,nickname:nickname}).exec()
   }
+
+  async deleteRelatedComments(postId){
+    return  Comment.deleteMany({ postId:postId }).exec()
+
+  }
 }

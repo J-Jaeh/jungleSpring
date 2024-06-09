@@ -1,14 +1,15 @@
 import express from 'express'
 
-import Comment from '../models/comment.js'
 import authMiddleware from '../middleware/auth-middleware.js'
+import { checkPostId } from '../middleware/check-objectId-middleware.js'
 import { PostService } from '../services/postService.js'
+import { CommentService } from '../services/commentService.js'
 
 
 let router = express.Router()
 
 const postService = new PostService()
-
+const commentService = new CommentService()
 
 /**
  * 전체 게시글 조회
@@ -44,30 +45,28 @@ router.post('/create', [authMiddleware, async (req, res) => {
 /**
  * 글 조회
  */
-router.get('/:id', async (req, res) => {
-  const { id } = req.params
-  const findPost = await postService.getPost(id)
-
-  if (!findPost) return res.status(404).json({ success: false, errorMessage: 'Post not found' })
-
-  return res.status(200).json({
-    success: true,
-    posts_id: findPost,
-  })
-})
+router.get('/:postId', [checkPostId,async (req, res) => {
+  const { postId } = req.params
+  try {
+    const findPost = await postService.getPost(postId)
+    return res.status(200).json({ success: true, posts: findPost})
+  } catch (err) {
+    return res.status(404).json({ success: false, errorMessage: err.message })
+  }
+}])
 
 /**
  * 글 수정
  */
-router.patch('/:id', [authMiddleware, async (req, res) => {
+router.patch('/:postId', [authMiddleware,checkPostId, async (req, res) => {
 
   const nickname = res.locals.nickname
-  const { id } = req.params
+  const { postId } = req.params
   const request = req.body
 
-  const editPost = await postService.editPost(id, request, nickname)
+  const editPost = await postService.editPost(postId, request, nickname)
   if (!editPost) {
-    return res.status(404).send({success: false, errorMessage: 'Unauthorized'})
+    return res.status(404).send({ success: false, errorMessage: 'Unauthorized' })
   }
   return res.status(200).json({ success: true, posts_id: editPost._id })
 }])
@@ -76,18 +75,15 @@ router.patch('/:id', [authMiddleware, async (req, res) => {
 /**
  * 글 삭제
  */
-router.delete('/:id', [authMiddleware, async (req, res) => {
-  const { id } = req.params
+router.delete('/:postId', [authMiddleware,checkPostId ,async (req, res) => {
+  const { postId } = req.params
   const nickname = res.locals.nickname
 
-  const deletePost = await postService.deletePost(id,nickname)
+  const deletePost = await postService.deletePost(postId, nickname)
   if (!deletePost) {
-    return res.status(404).send({success: false, errorMessage: 'Unauthorized'})
+    return res.status(404).send({ success: false, errorMessage: 'Unauthorized' })
   }
-  //연관된 댓글도 삭제해야함.
-  // const commentIds = await Comment.find({ postId: id }, { _id: 1 }).exec()
-  // // console.log(commentIds)
-  // await Comment.deleteMany({ _id: { $in: commentIds } }).exec()
+  await commentService.deleteComment(postId)
 
   return res.status(200).json({ success: true })
 }])

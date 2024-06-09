@@ -35,4 +35,8 @@ export class CommentService {
 
     return deleteComment
   }
+
+  async deleteRelatedComments(postId){
+      return this.commentModel.deleteRelatedComments(postId)
+  }
 }

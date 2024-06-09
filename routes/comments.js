@@ -1,5 +1,5 @@
 import express from 'express'
-import { CommentService } from '../services/commentServices.js'
+import { CommentService } from '../services/commentService.js'
 import { PostService } from '../services/postService.js'
 import { checkCommentId, checkPostId } from '../middleware/check-objectId-middleware.js'
 import authMiddleware from '../middleware/auth-middleware.js'
