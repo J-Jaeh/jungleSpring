@@ -2,8 +2,7 @@ import express from 'express'
 import mongoose from 'mongoose'
 import { CommentService } from '../services/commentServices.js'
 import { PostService } from '../services/postService.js'
-import { checkPostId, commentId } from '../middleware/check-objectId-middleware.js'
-// import Post from '../models/post.js'
+import { checkCommentId, checkPostId } from '../middleware/check-objectId-middleware.js'
 import authMiddleware from '../middleware/auth-middleware.js'
 
 const commentService = new CommentService()
@@ -55,32 +54,25 @@ router.post('/:postId', [authMiddleware, checkPostId, async (req, res) => {
 /**
  * 댓글 수정
  */
-router.patch('/:commentId', [authMiddleware, commentId, async (req, res) => {
+router.patch('/:commentId', [authMiddleware, checkCommentId, async (req, res) => {
   const { commentId } = req.params
   const { reqContent } = req.body
   const nickname = res.locals.nickname
-  // commentId가 유효한 ObjectId 형태인지 확인
-  if (!mongoose.Types.ObjectId.isValid(commentId)) {
-    return res.status(400).json({ success: false, errorMessage: 'Invalid comment ID' })
-  }
 
   if (!reqContent) return res.status(400).json({ success: false, errorMessage: '댓글 내용을 입력해주세요' })
-
-  const findComment = await Comment.findOne({ _id: commentId, nickname: nickname }).exec()
-
-  if (!findComment) return res.status(404).json({ success: false, errorMessage: 'Unauthorized' })
-
-  findComment.content = reqContent
-
-  await findComment.save()
-  return res.status(200).json({ success: true, comment_id: commentId })
+  try {
+    await commentService.editComment(commentId, reqContent, nickname)
+    return res.status(200).json({ success: true, comment_id: commentId })
+  } catch (err) {
+    return res.status(403).json({ success: false, errorMessage: 'Unauthorized' })
+  }
 }])
 
 
 /**
  * 댓글 삭제
  */
-router.delete('/:commentId', [authMiddleware, commentId, async (req, res) => {
+router.delete('/:commentId', [authMiddleware, checkCommentId, async (req, res) => {
   const { commentId } = req.params
   const nickname = res.locals.nickname
 

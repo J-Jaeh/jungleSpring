@@ -12,8 +12,17 @@ export class CommentService {
     return this.commentModel.createComment(comment)
   }
 
-  async getComments(postId){
+  async getComments(postId) {
     return this.commentModel.getComments(postId)
+  }
+
+  async editComment(id, req, reqNickname) {
+    const editComment = this.commentModel.editComment(id, req, reqNickname)
+    if (!editComment) {
+      return new Error('Unauthorized')
+    }
+
+    return editComment
   }
 
 }
