@@ -11,12 +11,8 @@ const userService = new UserService()
  */
 router.post('/register', async (req, res) => {
   const { nickname, password, checkPassword } = req.body
-  if (checkPassword !== password) {
-    return res.status(400).send({ error: 'Passwords do not match' })
-  }
-  if (password.includes(nickname)) {
-    return res.status(400).send({ error: '비밀번호에는 닉네임을 포함할 수 없습니다' })
-  }
+  const result = await validateRegisterInput(nickname, password,checkPassword)
+  if(result.error) return  res.status(400).json({ success: false, error: result.error })
 
   try {
     const user = await userService.registerUser({ nickname: nickname, password:hashedPassword(password)  })
@@ -47,3 +43,10 @@ router.post('/login', async (req, res) => {
 })
 
 export default router
+
+
+function validateRegisterInput (nickname,pw,checkPw) {
+  if(pw !==checkPw) return {error:'Passwords do not match'}
+  if(pw.includes(nickname)) return {error:'비밀번호에는 닉네임을 포함할 수 없습니다'}
+  return { success : true}
+}
