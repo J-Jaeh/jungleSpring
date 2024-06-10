@@ -5,12 +5,13 @@
 - https://express-node.site/api-docs/
 
 ## 프로젝트 구조
+
 ```
-.
 ├── README.md
 ├── app.js
 ├── config
-│   └── db.js
+│   ├── db.js
+│   └── swagger.js
 ├── labels.json
 ├── middleware
 │   ├── auth-middleware.js
@@ -30,10 +31,12 @@
 │   ├── commentService.js
 │   ├── postService.js
 │   └── userService.js
+├── swaggerDocs.js
 └── utils
     └── auth-util.js
 ```
 
-### ERD
+
+## ERD
 
 ![image](https://github.com/J-Jaeh/jungleSpring/assets/117059721/98da428f-ea49-4130-8f0c-814f1f908399)
