@@ -1,7 +1,7 @@
 ### End point
 - https://express-node.site/
 
-## API with Swageer
+## API with Swagger
 - https://express-node.site/api-docs/
 
 ### 프로젝트 구조
