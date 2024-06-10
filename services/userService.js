@@ -19,7 +19,8 @@ export class UserService {
   }
 
   async loginUser(req) {
-    const findUser = await this.userModel.findUser({ nickname: req.nickname })
+    const findUser = await this.userModel.findUser(req.nickname)
     if (!findUser) return new Error('Incorrect Username or Password, or Unregistered User')
+    return findUser
   }
 }

@@ -15,7 +15,7 @@ router.post('/register', async (req, res) => {
   if(result.error) return  res.status(400).json({ success: false, error: result.error })
 
   try {
-    const user = await userService.registerUser({ nickname: nickname, password:hashedPassword(password)  })
+    const user = await userService.registerUser({ nickname: nickname, password: await hashedPassword(password)  })
     res.status(200).send({ success: true, user_id: user._id })
   } catch (err) {
     if (err.code === 11000)
@@ -34,7 +34,7 @@ router.post('/login', async (req, res) => {
   const { nickname, password } = req.body
   try {
     const loginUser= await userService.loginUser({ nickname: nickname, password: password })
-    comparePassword(password, loginUser.password)
+    await comparePassword(password, loginUser.password)
     await generateJwtToken(res, nickname)
     return res.status(200).send({ success: true })
   }catch(err) {
